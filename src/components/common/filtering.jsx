@@ -2,8 +2,7 @@ import React from "react";
 import _ from "lodash";
 import PropTypes from "prop-types";
 
-const Filtering = props => {
-  const { items, selectedItem, onItemSelect } = props;
+const Filtering = ({ items, selectedItem, onItemSelect }) => {
   return (
     <div>
       {items.map(item => (
