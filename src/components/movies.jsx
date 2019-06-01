@@ -6,6 +6,7 @@ import Pagination from "./common/pagination";
 import Filtering from "./common/filtering";
 import { paginate } from "../utils/pagination";
 import _ from "lodash";
+import {Link} from "react-router-dom";
 
 export default class Table extends Component {
   state = {
@@ -91,7 +92,6 @@ export default class Table extends Component {
     const { totalCount, data: movies } = this.getPagedData();
     return (
       <div className="container">
-        <h4> There are {totalCount} movies in database </h4>
         <div className="row">
           <div className="col-3">
             <ul className="list-group">
@@ -103,6 +103,8 @@ export default class Table extends Component {
             </ul>
           </div>
           <div clasName="col">
+          <h5> There are {totalCount} movies in database</h5>
+          <Link to="/movies/new"><button className="btn btn-primary" onClick="/login">Add New Movie</button></Link>
             <MovieTable
               movies={movies}
               sortColumn={sortColumn}

@@ -17,18 +17,20 @@ class movieForm extends Form {
   };
 
   schema = {
-    _id: Joi.string(),
+    _id: Joi.string().required(),
     title: Joi.string()
       .label("Title"),
     genreId: Joi.string()
       .required()
       .label("Genre"),
     numberInStocks: Joi.number()
+    .integer()
     .min(0)
     .max(100)
     .required()
     .label("Numbers in stock"),
     dailyRentalRate: Joi.number()
+    .integer()
     .min(0)
     .max(10)
     .label("Rate")
@@ -38,7 +40,7 @@ class movieForm extends Form {
     const genre = getGenres();
     this.setState({genre})
 
-    const movieId = this.props.match.params.id;
+    const movieId = this.props.match.params.div
     if(movieId==="new") return;
 
     const movie = getMovie(movieId);
@@ -59,7 +61,7 @@ class movieForm extends Form {
 
   doSubmit = () => {
     //call the server
-    saveMovie(this.state.data);
+    saveMovie(this.state.data)
 
     this.props.history.push("/movies")
   };
@@ -70,8 +72,8 @@ class movieForm extends Form {
         <h1>Movie Form</h1>
         <form onSubmit={this.handleSubmit}>
           {this.renderInput("title", "Title")}
-          {this.renderSelect("genreId","Genre",this.state.genre)}
-          {this.renderInput("numberInStocks", "Numbers in stock")}
+          {this.renderSelect("genre", "Genre")}
+          {this.renderInput("numbersInStock", "Numbers in stock")}
           {this.renderInput("dailyRentalRate", "Rate")}
           {this.renderButton("Save")}
         </form>
