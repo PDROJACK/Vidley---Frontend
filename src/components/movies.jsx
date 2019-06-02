@@ -7,6 +7,8 @@ import Filtering from "./common/filtering";
 import { paginate } from "../utils/pagination";
 import _ from "lodash";
 import {Link} from "react-router-dom";
+import Input from "./common/input";
+import SearchBox from "./common/search";
 
 export default class Table extends Component {
   state = {
@@ -14,6 +16,7 @@ export default class Table extends Component {
     genres: [],
     pageSize: 4,
     currentPage: 1,
+    searchQuery: "",
     sortColumn: { path: "title", order: "asc" }
   };
 
@@ -49,9 +52,14 @@ export default class Table extends Component {
   handleGenreSelect = genre => {
     this.setState({
       selectedGenre: genre,
+      searchQuery: "",
       currentPage: 1
     });
   };
+
+  handleSearch = query => {
+    this.setState({searchQuery: query, selectedGenre: null , currentPage: 1})
+  } 
 
   handleSort = sortColumn => {
     this.setState({ sortColumn });
@@ -63,13 +71,18 @@ export default class Table extends Component {
       pageSize,
       movies: allMovies,
       selectedGenre,
-      currentPage
+      currentPage,
+      searchQuery
     } = this.state;
-    const filtered =
-      selectedGenre && selectedGenre._id
+
+    let filtered = allMovies;
+    if(searchQuery)
+      filtered=allMovies.filter(m=>m.title.toLowerCase().startsWith(searchQuery.toLowerCase()));
+    else {
+      filtered = selectedGenre && selectedGenre._id
         ? allMovies.filter(m => m.genre._id === selectedGenre._id)
         : allMovies;
-
+    }
     const sorted = _.orderBy(filtered, [sortColumn.path], [sortColumn.order]);
     const movies = paginate(currentPage, pageSize, sorted);
 
@@ -83,6 +96,7 @@ export default class Table extends Component {
       selectedGenre,
       pageSize,
       movies: allMovies,
+      searchQuery,
       genres,
       sortColumn
     } = this.state;
@@ -95,6 +109,7 @@ export default class Table extends Component {
         <div className="row">
           <div className="col-3">
             <ul className="list-group">
+              <Link to="/movies/new"><button className="btn btn-primary" onClick="/login">Add New Movie</button></Link>
               <Filtering
                 items={genres}
                 selectedItem={selectedGenre}
@@ -104,7 +119,7 @@ export default class Table extends Component {
           </div>
           <div clasName="col">
           <h5> There are {totalCount} movies in database</h5>
-          <Link to="/movies/new"><button className="btn btn-primary" onClick="/login">Add New Movie</button></Link>
+          <SearchBox value={searchQuery} onChange={this.handleSearch}/>
             <MovieTable
               movies={movies}
               sortColumn={sortColumn}
