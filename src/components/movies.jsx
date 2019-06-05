@@ -1,6 +1,6 @@
 import React, { Component } from "react";
-import { getMovies } from "../services/fakeMovieService";
-import { getGenres } from "../services/fakeGenreService";
+import { getMovies, deleteMovie } from "../services/movieService";
+import { getGenres } from "../services/genreService";
 import MovieTable from "./moviesTable.jsx";
 import Pagination from "./common/pagination";
 import Filtering from "./common/filtering";
@@ -20,19 +20,31 @@ export default class Table extends Component {
     sortColumn: { path: "title", order: "asc" }
   };
 
-  componentDidMount() {
-    const genre = [{ _id: "", name: "All Genre" }, ...getGenres()];
+  async componentDidMount(){
+    const {data:resultGenre} = await getGenres();
+    const {data:resultMovie} = await getMovies();
+    const genre = [{ _id: "", name: "All Genre" }, ...resultGenre];
     this.setState({
-      movies: getMovies(),
+      movies: resultMovie,
       genres: genre
     });
   }
 
-  handleDelete = movie => {
-    const movies = this.state.movies.filter(m => m._id !== movie._id);
+  handleDelete = async movie => {
+    const originalMovies = this.state.movies;
+    const movies = originalMovies.filter(m => m._id !== movie._id);
     this.setState({
-      movies: movies
+      movies
     });
+
+    try{
+      await deleteMovie(movie._id)
+    } catch(ex) {
+      if(ex.response && ex.response.status === 404){
+        alert("Movie already deleted");
+      }
+      this.setState({movies:originalMovies});
+    }
   };
 
   handleLiked = movie => {
@@ -78,10 +90,8 @@ export default class Table extends Component {
     let filtered = allMovies;
     if(searchQuery)
       filtered=allMovies.filter(m=>m.title.toLowerCase().startsWith(searchQuery.toLowerCase()));
-    else {
-      filtered = selectedGenre && selectedGenre._id
-        ? allMovies.filter(m => m.genre._id === selectedGenre._id)
-        : allMovies;
+    else if (selectedGenre && selectedGenre._id) {
+       filtered = allMovies.filter(m => m.genre._id === selectedGenre._id)
     }
     const sorted = _.orderBy(filtered, [sortColumn.path], [sortColumn.order]);
     const movies = paginate(currentPage, pageSize, sorted);
@@ -89,7 +99,7 @@ export default class Table extends Component {
     return { totalCount: filtered.length, data: movies };
   };
 
-  render() {
+  render(){
     const { length: count } = this.state.movies;
     const {
       currentPage,
