@@ -7,7 +7,6 @@ import Filtering from "./common/filtering";
 import { paginate } from "../utils/pagination";
 import _ from "lodash";
 import {Link} from "react-router-dom";
-import Input from "./common/input";
 import SearchBox from "./common/search";
 
 export default class Table extends Component {
@@ -105,7 +104,7 @@ export default class Table extends Component {
       currentPage,
       selectedGenre,
       pageSize,
-      movies: allMovies,
+      movies,
       searchQuery,
       genres,
       sortColumn
@@ -119,7 +118,7 @@ export default class Table extends Component {
         <div className="row">
           <div className="col-3">
             <ul className="list-group">
-              <Link to="/movies/new"><button className="btn btn-primary" onClick="/login">Add New Movie</button></Link>
+              {this.props.user && <Link to="/movies/new"><button className="btn btn-primary" onClick="/login">Add New Movie</button></Link>}
               <Filtering
                 items={genres}
                 selectedItem={selectedGenre}
@@ -131,6 +130,7 @@ export default class Table extends Component {
           <h5> There are {totalCount} movies in database</h5>
           <SearchBox value={searchQuery} onChange={this.handleSearch}/>
             <MovieTable
+              user= {this.props.user}
               movies={movies}
               sortColumn={sortColumn}
               onSort={this.handleSort}

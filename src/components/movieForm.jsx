@@ -3,13 +3,14 @@ import Joi from "joi-browser";
 import Form from "./common/form";
 import { getGenres } from "../services/genreService";
 import { getMovie, saveMovie } from "../services/movieService";
+import {toast} from "react-toastify"; 
 
 class movieForm extends Form {
   state = {
     data: {
       title: "",
       genreId: "",
-      numberInStocks: "",
+      numberInStock: "",
       dailyRentalRate: ""
     },
     genre:[],
@@ -19,22 +20,20 @@ class movieForm extends Form {
   schema = {
     _id: Joi.string(),
     title: Joi.string()
-          .label("Title")
-          .required(),
+      .label("Title"),
     genreId: Joi.string()
-            .required()
-            .label("Genre"),
-    numberInStocks: Joi.number()
-                    .integer()
-                    .min(0)
-                    .max(100)
-                    .required()
-                    .label("Numbers in stock"),
+      .required()
+      .label("Genre"),
+    numberInStock: Joi.number()
+    .min(0)
+    .max(100)
+    .required()
+    .label("Numbers in stock"),
     dailyRentalRate: Joi.number()
-                      .integer()
-                      .min(0)
-                      .max(10)
-                      .label("Rate")
+    .min(0)
+    .max(10)
+    .required()
+    .label("Rate")
   };
 
   async populateMovie(){
@@ -45,7 +44,7 @@ class movieForm extends Form {
       this.setState({data: this.mapToViewModel(movie)})
     } catch(ex) {
       if(ex.response && ex.response.status === 404) 
-        alert("movies not found")
+        toast.alert("Movie is not present")
       }   
   }
 
@@ -64,7 +63,7 @@ class movieForm extends Form {
       _id:movie._id,
       title: movie.title,
       genreId: movie.genre._id,
-      numberInStocks: movie.numberInStocks,
+      numberInStock: movie.numberInStock,
       dailyRentalRate: movie.dailyRentalRate
     }
   }
@@ -82,8 +81,8 @@ class movieForm extends Form {
         <h1>Movie Form</h1>
         <form onSubmit={this.handleSubmit}>
           {this.renderInput("title", "Title")}
-          {this.renderSelect("genre", "Genre")}
-          {this.renderInput("numbersInStock", "Numbers in stock")}
+          {this.renderSelect("genreId","Genre",this.state.genre)}
+          {this.renderInput("numberInStock", "Numbers in stock")}
           {this.renderInput("dailyRentalRate", "Rate")}
           {this.renderButton("Save")}
         </form>

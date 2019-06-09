@@ -1,6 +1,5 @@
 import http from './httpService';
 import { apiUrl } from "../config.json";
-import axios from 'axios';
 
 const api = apiUrl+"/movies"
 
